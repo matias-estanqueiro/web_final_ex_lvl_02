@@ -1,0 +1,51 @@
+------------------------------------------------------
+PUNTOS QUE FALTAN DESARROLLAR
+------------------------------------------------------
+
+Modo de entrega: despliegue de la API en un servidor y documentación.
+
+5- Funcionalidades complementarias:
+    a) Json WebToken (el usuario se registra o loguea, obtiene un token y sólo con ese token  está habilitado para acceder a un recurso o crearlo, borrarlo, o lo que ustedes imaginen)
+    d) Recuperación de contraseña (opcional pero recomendado)
+
+------------------------------------------------------
+DEV LOG
+------------------------------------------------------
+funciones básicas
+
+- CRUD
+    18/05 00.12 // Product -> create, delete & update OK!
+    18/05 00.23 // Product -> listAll & listCategory OK!
+
+    18/05 23.51 // User -> register, delete & modify OK!
+    18/05 23.51 // User -> listAll & login OK!
+
+    21/05 14.43 // Blog -> create, delete & update OK!
+    21/05 14.43 // Blog -> listAll OK!
+
+- ERROR HANDLER
+    21/05 17.30 // Product -> error  handler OK! (needs review later)
+    21/05 22.04 // User -> error  handler OK! 
+    21/05 22.04 // Blog -> error  handler OK! (needs review later)
+
+- PASSWORD ENCRYPTION
+    22/05 00.43 // User -> hash & check password (npm bcrypt) OK!
+
+- IMAGE PROFILE   
+    22/05 22.55 // User -> uplolad image ok!
+
+- EXPRESS-VALIDATOR
+    25/05 17.17 // Posts, Products and Users validators OK!
+
+- SEARCH
+    25/05 20.13 // Post -> search word in title OK!
+    25/05 20.13 // User, Product -> list by id OK!
+    
+
+------------------------------------------------------
+QUEDA PENDIENTE
+------------------------------------------------------
+
+- EN MODIFY USER FALTA HASHEO DE CONTRASEÑA Y FALTA UPLOAD DE IMAGEN
+- EN POST express-validator TENGO QUE VER COMO VALIDAR EL BODY DEL COMMENT
+- MEJORAR LA BUSQUEDA POR TITULO (por ejemplo >> busco lago y me encuentra murcieLAGO)
