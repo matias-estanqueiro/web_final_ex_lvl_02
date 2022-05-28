@@ -2,6 +2,7 @@
 
 const router = require("express").Router();
 const { validatorPost } = require("../validators/postValidator");
+const isAuth = require("../utils/handleAuthorization");
 const {
     listAllPosts,
     listPostWithWord,
@@ -14,10 +15,10 @@ const {
 router.get("/", listAllPosts);
 
 // get posts with "word"
-router.get("/:word", listPostWithWord);
+router.get("/find/:word", listPostWithWord);
 
 //add new post
-router.post("/add-post", validatorPost, newPost);
+router.post("/add-post", isAuth, validatorPost, newPost);
 
 // delete existing post (owner function only)
 router.delete("/delete/:id", deletePost);

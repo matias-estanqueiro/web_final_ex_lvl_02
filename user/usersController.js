@@ -1,7 +1,6 @@
-"use strict";
-
 const User = require("./usersModel");
 const { hashPassword, checkPassword } = require("../utils/handlePassword");
+const { tokenSign } = require("../utils/handleJWT");
 
 //get all users of the database
 const listAllUsers = async (req, res, next) => {
@@ -20,10 +19,21 @@ const listUserById = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
     const result = await User.find({ mail: req.body.mail });
     // If result returns empty, it means that the email is not registered in the database.
-    if (!result.length) next();
+    if (!result.length) return next();
     // The encryption of the password entered by the user is compared with the password that was saved encrypted in the database
     if (await checkPassword(req.body.password, result[0].password)) {
-        res.status(200).json({ message: `Welcome ${result[0].name}` });
+        // Token Payload
+        const userData = {
+            name: result[0].name,
+            surname: result[0].surname,
+            mail: result[0].mail,
+        };
+        // Token creation
+        const tokenData = { token: await tokenSign(userData, "2h"), userData };
+        res.status(200).json({
+            message: `Welcome ${result[0].name}`,
+            token_info: tokenData,
+        });
     } else {
         let error = new Error();
         error.status = 401;
@@ -38,7 +48,8 @@ const registerUser = async (req, res, next) => {
     let file = null;
     req.body.file
         ? (file = `${process.env.PUBLIC_URL}/${req.file.filename}`)
-        : (file = `${process.env.PUBLIC_URL}/img-no-avatar.jpg`);
+        : // Generic file (image) in case that the user dont upload it
+          (file = `${process.env.PUBLIC_URL}/img-no-avatar.jpg`);
     // Encryption of the password entered by the user for storage in the database
     const password = await hashPassword(req.body.password);
     // Assigning password to the User record
@@ -49,7 +60,18 @@ const registerUser = async (req, res, next) => {
     });
     try {
         result = await newUser.save();
-        res.status(201).json(result);
+        // Token payload
+        const userData = {
+            name: req.body.name,
+            surname: req.body.surname,
+            mail: req.body.mail,
+        };
+        // Token creation
+        const tokenData = { token: await tokenSign(userData, "2h"), userData };
+        res.status(201).json({
+            message: `${result[0].name} Registered!`,
+            token_info: tokenData,
+        });
     } catch (error) {
         error.status = 400;
         next(error);

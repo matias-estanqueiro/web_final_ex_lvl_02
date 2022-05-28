@@ -29,7 +29,7 @@ router.post(
 );
 
 // get specific user
-router.get("/view-user/:id", listUserById);
+router.get("/view/:id", listUserById);
 
 // delete existing user
 router.delete("/remove/:id", deleteUser);

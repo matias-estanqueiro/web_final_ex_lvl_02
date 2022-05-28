@@ -32,7 +32,7 @@ const validatorUser = [
         .isEmail()
         .withMessage("Enter valid email address")
         // Normalizacion de email (minusculas)
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
 
     check("password")
         .trim()
@@ -60,7 +60,7 @@ const validatorLoginUser = [
         .isEmail()
         .withMessage("Enter valid email address")
         // Normalizacion de email (minusculas)
-        .normalizeEmail(),
+        .normalizeEmail({ gmail_remove_dots: false }),
 
     (req, res, next) => {
         const errors = validationResult(req);

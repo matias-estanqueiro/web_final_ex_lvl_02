@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 });
 
 // routes -> USERS
-app.use("/users", require("./users/usersRoute"));
+app.use("/user", require("./user/usersRoute"));
 
 // routes -> ITEMS
 app.use("/shop", require("./shop/productsRoute"));
@@ -51,6 +51,6 @@ app.use((error, req, res, next) => {
 // listen
 app.listen(port, (err) => {
     err
-        ? console.log(`Error: ${err}`)
+        ? console.log(`Error: ${{ err: err.message }}`)
         : console.log(`App run at http://localhost:${port}`);
 });

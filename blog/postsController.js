@@ -17,7 +17,11 @@ const listPostWithWord = async (req, res, next) => {
 // add a new blog post
 const newPost = async (req, res, next) => {
     try {
-        const newPost = new Post({ ...req.body });
+        console.log(req.userInfo.name);
+        const newPost = new Post({
+            author: req.userInfo.name + " " + req.userInfo.surname,
+            ...req.body,
+        });
         const result = await newPost.save();
         res.status(201).json(result);
     } catch (error) {
