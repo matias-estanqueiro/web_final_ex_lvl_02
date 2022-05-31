@@ -41,8 +41,6 @@ const validatorUser = [
             "This password must be at least 8 characters and contain at least one uppercase letter, one lower case letter, one number and one special alphanumeric character"
         ),
 
-    check("address").trim(),
-
     check("phone").trim().isNumeric().withMessage("Only numbers"),
 
     (req, res, next) => {

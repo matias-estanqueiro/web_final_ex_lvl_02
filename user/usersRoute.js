@@ -4,6 +4,7 @@ const router = require("express").Router();
 const {
     validatorUser,
     validatorLoginUser,
+    validatorResetPassword,
 } = require("../validators/userValidator");
 const fileUpload = require("../utils/handleStorage");
 const {
@@ -13,6 +14,10 @@ const {
     modifyUser,
     listAllUsers,
     listUserById,
+    retrievePass,
+    resetPassword,
+    saveNewPassword,
+    retrievePassword,
 } = require("./usersController");
 
 // ------------------------------------------------------------- //
@@ -39,5 +44,18 @@ router.post("/modify/:id", validatorUser, modifyUser);
 
 // get all users from the database
 router.get("/", listAllUsers);
+
+// --------------------- PASSWORD RECOVERY ROUTES ------------------- //
+
+// form for the user to enter their email and thus be able to recover their password
+router.post("/retrieve-password", retrievePassword);
+
+// link and password recovery form for the user to reset their password
+router.get("/reset-password/:token", resetPassword);
+
+// we get the new password
+router.post("/reset-password/:token", validatorLoginUser, saveNewPassword);
+
+// ------------------------------------------------------------------ //
 
 module.exports = router;

@@ -1,6 +1,12 @@
 const User = require("./usersModel");
+// BCRYPT: A library to help you hash passwords.
 const { hashPassword, checkPassword } = require("../utils/handlePassword");
+// JSONWEBTOKEN: An implementation of JSON Web Tokens.
 const { tokenSign } = require("../utils/handleJWT");
+// NODEMAILER: Send emails from Node.js
+const { transport } = require("../utils/handleMail");
+// Extracts data validated or sanitized by express-validator from the request and builds an object with them
+const { matchedData } = require("express-validator");
 
 //get all users of the database
 const listAllUsers = async (req, res, next) => {
@@ -44,6 +50,7 @@ const loginUser = async (req, res, next) => {
 
 // register new user
 const registerUser = async (req, res, next) => {
+    cleanBody = matchedData(req);
     // Definition of the path of the file to be stored in the database
     let file = null;
     req.body.file
@@ -69,7 +76,7 @@ const registerUser = async (req, res, next) => {
         // Token creation
         const tokenData = { token: await tokenSign(userData, "2h"), userData };
         res.status(201).json({
-            message: `${result[0].name} Registered!`,
+            message: `${result.name} Registered!`,
             token_info: tokenData,
         });
     } catch (error) {
@@ -84,7 +91,7 @@ const deleteUser = async (req, res, next) => {
     !result ? next() : res.status(200).json(result);
 };
 
-//modify user information (profile)
+// modify user information (profile)
 const modifyUser = async (req, res, next) => {
     try {
         const result = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -97,6 +104,49 @@ const modifyUser = async (req, res, next) => {
     }
 };
 
+// --------------------- PASSWORD RECOVERY CONTROLLERS ------------------- //
+
+// user forgets his password
+const retrievePassword = async (req, res, next) => {
+    // loginUser() is not reused because in the function req.body.password is compared with the result of the DB, and in the req.body of retrieve-password the password itself is not found
+    const result = await User.find({ mail: req.body.mail });
+    if (!result.length) return next();
+    // Token Payload
+    const userData = {
+        name: result[0].name,
+        surname: result[0].surname,
+        mail: result[0].mail,
+    };
+    // Token creation
+    const token = await tokenSign(userData, "10m");
+    const link = `${process.env.PUBLIC_URL}/user/reset-password/${token}`;
+
+    const mailPassword = {
+        from: "user_support@drumat.com",
+        to: userData.mail,
+        subject: "[DRUMAT] Password recovery link",
+        html: `
+        <h2> Recovery Password </h2>
+        <p>To reset password click on the link</p>
+        <a href="${link}">click!</a>
+        `,
+    };
+    transport.sendMail(mailPassword, (err, data, next) => {
+        if (err) return next(err);
+        res.status(200).json({
+            message: `${userData.name}, an email with a password recovery link has been sent to ${userData.mail}. You have 10 minutes to reset your password`,
+        });
+    });
+};
+
+const resetPassword = async (req, res, next) => {
+    res.render("formResetPass");
+};
+
+const saveNewPassword = async (req, res, next) => {};
+
+// ----------------------------------------------------------------------- //
+
 module.exports = {
     listAllUsers,
     listUserById,
@@ -104,4 +154,7 @@ module.exports = {
     deleteUser,
     modifyUser,
     loginUser,
+    retrievePassword,
+    resetPassword,
+    saveNewPassword,
 };

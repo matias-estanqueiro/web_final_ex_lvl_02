@@ -5,7 +5,6 @@ PUNTOS QUE FALTAN DESARROLLAR
 Modo de entrega: despliegue de la API en un servidor y documentación.
 
 5- Funcionalidades complementarias:
-    a) Json WebToken (el usuario se registra o loguea, obtiene un token y sólo con ese token  está habilitado para acceder a un recurso o crearlo, borrarlo, o lo que ustedes imaginen)
     d) Recuperación de contraseña (opcional pero recomendado)
 
 ------------------------------------------------------
@@ -45,6 +44,8 @@ funciones básicas
     28/05 01.55 // User -> login & register with token OK!
     28/05 01.55 // Post -> add post with valid token OK!
 
+- RECOVERY PASSWORD MAIL
+    31/05 00.06 // User -> send mail OK! form render OK!
 
 ------------------------------------------------------
 QUEDA PENDIENTE
@@ -54,9 +55,10 @@ QUEDA PENDIENTE
 
 - CUANDO SUBO LA IMAGEN, FALTA HACERLE RESIZE
 
-- EN MICROSERVICIO USER CUANDO EL USUARIO NO SE REGISTRA SUBE LA IMAGEN IGUAL ESO ESTA MAL
+- EN MICROSERVICIO USER CUANDO EL USUARIO NO SE REGISTRA SUBE LA IMAGEN IGUAL --- ESO ESTA MAL ---
 - EN MICROSERVICIO BLOG CON express-validator TENGO QUE VER COMO VALIDAR EL BODY DEL COMMENT
-- EN MICROSERVICIO BLOG FALTA MEJORAR LA BUSQUEDA POR TITULO (por ejemplo >> busco lago y me encuentra murcieLAGO)
+- EN MICROSERVICIO BLOG FALTA MEJORAR LA BUSQUEDA POR TITULO UTILIZANDO OBJECT QUERY Y NO GENERANDO UN NUEVO ENDPOINT
 - EN HANDLE_JWT ->  DISCRIMINAR EL TIPO DE ERROR QUE DEVUELVE
 
 - TOKEN: SOLO ESTA APLICADO EN NEW POST, HAY QUE APLICARLO EN LAS DEMAS FUNCIONALIDADES DE POST Y EN LAS DE PRODUCT
+- MATCHED-DAT SOLO ESTA APLICADO EN REGISTER, HAY QUE APLICARLO A TODO LO DEMAS

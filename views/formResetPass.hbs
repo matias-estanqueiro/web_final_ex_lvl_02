@@ -1,0 +1,61 @@
+<section class="mt-5 container">
+
+    <div class="row justify-content-center">
+        <h2 class="my-5 text-center">Password Recovery</h2>
+        <p class="text-center">Welcome
+            {{tokenStatus.name}}
+            siga las instrucciones por favor</p>
+
+        <div class="col-10 col-lg-5">
+            <form
+                action="/users/reset/{{token}}"
+                method="post"
+                class="border border-dark rounded p-4"
+            >
+
+                <input
+                    class="form-control mt-3"
+                    type="password"
+                    maxlength="15"
+                    placeholder="Type new password"
+                    autocomplete="new-password"
+                    name="password_1"
+                    autofocus
+                />
+                <div id="passwordHelpBlock" class="form-text mb-4">
+                    Your password must be 8-15 characters long.
+                </div>
+
+                <input
+                    class="form-control"
+                    type="password"
+                    maxlength="15"
+                    placeholder="Repeat new password"
+                    autocomplete="new-password"
+                    name="password_2"
+                />
+                <div id="repeatPasswordHelpBlock" class="form-text mb-5">
+                    Both passwords must be identical.
+                </div>
+                {{#each arrWarnings}}
+                    <div class="alert alert-danger" role="alert">
+                        {{msg}}
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                {{/each}}
+                <div class="d-flex justify-content-center">
+                    <input
+                        type="submit"
+                        class="btn btn-success"
+                        value="send new password"
+                    />
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

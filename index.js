@@ -6,10 +6,29 @@ const port = process.env.PORT || 3000;
 
 const express = require("express");
 const app = express();
+const path = require("path");
 
+// adds a middleware for serving static files to your Express app.
 app.use(express.static("public"));
+// express.json() is a built in middleware function in Express. It parses incoming JSON requests and puts the parsed data in req.body.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//bootstrap - static folder
+app.use(
+    "/css",
+    express.static(path.join(__dirname, "node_modules/bootstrap/dist/css"))
+);
+app.use(
+    "/js",
+    express.static(path.join(__dirname, "node_modules/bootstrap/dist/js"))
+);
+
+// views - handlebars setup
+const hbs = require("express-handlebars");
+app.set("view engine", "hbs");
+app.set("views", path.join(__dirname, "views"));
+app.engine("hbs", hbs.engine({ extname: "hbs" }));
 
 // frontend dev
 app.get("/", (req, res) => {
@@ -19,16 +38,16 @@ app.get("/", (req, res) => {
     res.send(content);
 });
 
-// routes -> USERS
+// routes -> users
 app.use("/user", require("./user/usersRoute"));
 
-// routes -> ITEMS
+// routes -> items
 app.use("/shop", require("./shop/productsRoute"));
 
-// routes -> POSTS
+// routes -> posts
 app.use("/blog", require("./blog/postsRoute"));
 
-// USE --> Catch all route
+// use --> Catch all route
 app.use((req, res, next) => {
     let error = new Error();
     error.status = 404;
@@ -36,7 +55,7 @@ app.use((req, res, next) => {
     next(error);
 });
 
-// Error Handler
+// error Handler
 app.use((error, req, res, next) => {
     if (!error.status) {
         error.status = 500;
