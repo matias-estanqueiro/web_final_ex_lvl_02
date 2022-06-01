@@ -6,9 +6,9 @@ const { check, validationResult } = require("express-validator");
 
 const validatorUser = [
     check("name")
-        // Elimina los espacios en blanco al principio y al final
+        // Remove leading and trailing whitespace
         .trim()
-        //'es-ES permite caracteres de idioma español (acentos, ñ, etc)
+        // 'es-ES allows Spanish language characters (accents, ñ, etc)
         .isAlpha("en-US", { ignore: " " })
         .withMessage("Only letters & intermediate space")
         .isLength({ min: 2, max: 90 })
@@ -31,7 +31,7 @@ const validatorUser = [
     check("mail")
         .isEmail()
         .withMessage("Enter valid email address")
-        // Normalizacion de email (minusculas)
+        // Email normalization (lowercase)
         .normalizeEmail({ gmail_remove_dots: false }),
 
     check("password")
@@ -45,7 +45,7 @@ const validatorUser = [
 
     (req, res, next) => {
         const errors = validationResult(req);
-        // Si errors NO esta vacio
+        // If errors is NOT empty
         !errors.isEmpty()
             ? res.status(400).json({ errores: errors.array() })
             : next();
@@ -57,16 +57,43 @@ const validatorLoginUser = [
     check("mail")
         .isEmail()
         .withMessage("Enter valid email address")
-        // Normalizacion de email (minusculas)
+        // Email normalization (lowercase)
         .normalizeEmail({ gmail_remove_dots: false }),
 
     (req, res, next) => {
         const errors = validationResult(req);
-        // Si errors NO esta vacio
+        // If errors is NOT empty
         !errors.isEmpty()
             ? res.status(400).json({ errores: errors.array() })
             : next();
     },
 ];
 
-module.exports = { validatorUser, validatorLoginUser };
+const validatorResetPassword = [
+    check("password_1")
+        .trim()
+        .isStrongPassword()
+        .withMessage(
+            "This password must be at least 8 characters and contain at least one uppercase letter, one lower case letter, one number and one special alphanumeric character"
+        ),
+
+    check("password_2").custom(async (password_2, { req }) => {
+        if (req.body.password_1 !== password_2) {
+            throw new Error("Both passwords must be identical");
+        }
+    }),
+
+    (req, res, next) => {
+        const token = req.params.token;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const arrWarnings = errors.array();
+            res.render("formResetPass", { arrWarnings, token });
+        } else {
+            // Go to /user/reset-password/{{token}}
+            return next();
+        }
+    },
+];
+
+module.exports = { validatorUser, validatorLoginUser, validatorResetPassword };

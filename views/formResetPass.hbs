@@ -1,14 +1,14 @@
 <section class="mt-5 container">
 
     <div class="row justify-content-center">
-        <h2 class="my-5 text-center">Password Recovery</h2>
+        <h2 class="my-5 text-center">Password reset</h2>
         <p class="text-center">Welcome
             {{tokenStatus.name}}
-            siga las instrucciones por favor</p>
+            follow the instructions to reset your password</p>
 
         <div class="col-10 col-lg-5">
             <form
-                action="/users/reset/{{token}}"
+                action="/user/reset-password/{{token}}"
                 method="post"
                 class="border border-dark rounded p-4"
             >
@@ -52,7 +52,7 @@
                     <input
                         type="submit"
                         class="btn btn-success"
-                        value="send new password"
+                        value="Confirm"
                     />
                 </div>
             </form>

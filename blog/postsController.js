@@ -4,13 +4,17 @@ const Post = require("./postsModel");
 
 // show all blog posts
 const listAllPosts = async (req, res, next) => {
-    const result = await Post.find();
+    let result = null;
+    if (req.query.title) {
+        result = await Post.find({ title: { $regex: req.query.title } });
+    } else {
+        result = await Post.find();
+    }
     !result.length ? next() : res.status(200).json(result);
 };
 
 // show post with word in title
 const listPostWithWord = async (req, res, next) => {
-    const result = await Post.find({ title: { $regex: req.params.word } });
     !result.length ? next() : res.status(200).json(result);
 };
 

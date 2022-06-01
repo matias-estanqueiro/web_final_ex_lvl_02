@@ -14,10 +14,9 @@ const {
     modifyUser,
     listAllUsers,
     listUserById,
-    retrievePass,
+    retrievePassword,
     resetPassword,
     saveNewPassword,
-    retrievePassword,
 } = require("./usersController");
 
 // ------------------------------------------------------------- //
@@ -40,7 +39,7 @@ router.get("/view/:id", listUserById);
 router.delete("/remove/:id", deleteUser);
 
 // modify user information (profile)
-router.post("/modify/:id", validatorUser, modifyUser);
+router.post("/modify/:id", fileUpload.single("file"), modifyUser);
 
 // get all users from the database
 router.get("/", listAllUsers);
@@ -54,7 +53,7 @@ router.post("/retrieve-password", retrievePassword);
 router.get("/reset-password/:token", resetPassword);
 
 // we get the new password
-router.post("/reset-password/:token", validatorLoginUser, saveNewPassword);
+router.post("/reset-password/:token", validatorResetPassword, saveNewPassword);
 
 // ------------------------------------------------------------------ //
 

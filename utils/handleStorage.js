@@ -11,9 +11,9 @@ const storage = multer.diskStorage({
     },
     // Definition of the name of the files that are uploaded
     filename: (req, file, callback) => {
-        // I get the file extension so I can use it in the defined name
+        // Get the file extension so can use it in the defined name
         const ext = file.originalname.split(".").pop();
-        // I use Date.now() to generate non-repeating filenames and avoid conflicts
+        // Use Date.now() to generate non-repeating filenames and avoid conflicts
         const filename = `img-${Date.now()}.${ext}`;
         callback(null, filename);
     },

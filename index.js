@@ -8,11 +8,12 @@ const express = require("express");
 const app = express();
 const path = require("path");
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // adds a middleware for serving static files to your Express app.
 app.use(express.static("public"));
 // express.json() is a built in middleware function in Express. It parses incoming JSON requests and puts the parsed data in req.body.
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 //bootstrap - static folder
 app.use(

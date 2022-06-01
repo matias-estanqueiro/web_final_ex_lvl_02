@@ -2,7 +2,7 @@ const User = require("./usersModel");
 // BCRYPT: A library to help you hash passwords.
 const { hashPassword, checkPassword } = require("../utils/handlePassword");
 // JSONWEBTOKEN: An implementation of JSON Web Tokens.
-const { tokenSign } = require("../utils/handleJWT");
+const { tokenSign, tokenVerify } = require("../utils/handleJWT");
 // NODEMAILER: Send emails from Node.js
 const { transport } = require("../utils/handleMail");
 // Extracts data validated or sanitized by express-validator from the request and builds an object with them
@@ -30,6 +30,7 @@ const loginUser = async (req, res, next) => {
     if (await checkPassword(req.body.password, result[0].password)) {
         // Token Payload
         const userData = {
+            id: result[0]._id,
             name: result[0].name,
             surname: result[0].surname,
             mail: result[0].mail,
@@ -69,6 +70,7 @@ const registerUser = async (req, res, next) => {
         result = await newUser.save();
         // Token payload
         const userData = {
+            id: req.body._id,
             name: req.body.name,
             surname: req.body.surname,
             mail: req.body.mail,
@@ -94,6 +96,7 @@ const deleteUser = async (req, res, next) => {
 // modify user information (profile)
 const modifyUser = async (req, res, next) => {
     try {
+        // when the user modifies his data, he cannot modify his password from the endpoint itself. A change password button will be added that will use the "reset password" logic (mail + link + token)
         const result = await User.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
         });
@@ -113,6 +116,7 @@ const retrievePassword = async (req, res, next) => {
     if (!result.length) return next();
     // Token Payload
     const userData = {
+        id: result[0]._id,
         name: result[0].name,
         surname: result[0].surname,
         mail: result[0].mail,
@@ -126,7 +130,7 @@ const retrievePassword = async (req, res, next) => {
         to: userData.mail,
         subject: "[DRUMAT] Password recovery link",
         html: `
-        <h2> Recovery Password </h2>
+        <h2> Recovery Link </h2>
         <p>To reset password click on the link</p>
         <a href="${link}">click!</a>
         `,
@@ -139,11 +143,38 @@ const retrievePassword = async (req, res, next) => {
     });
 };
 
+// We show the form so that the user can reset the password
 const resetPassword = async (req, res, next) => {
-    res.render("formResetPass");
+    // token
+    const token = req.params.token;
+    // user data
+    const tokenStatus = await tokenVerify(req.params.token);
+    if (tokenStatus instanceof Error) {
+        res.status(403).json({ message: "Invalid or Expired Token" });
+    } else {
+        res.render("formResetPass", { token, tokenStatus });
+    }
 };
 
-const saveNewPassword = async (req, res, next) => {};
+// Receive the new password from the form to store it in the database
+const saveNewPassword = async (req, res, next) => {
+    const token = req.params.token;
+    const tokenStatus = await tokenVerify(token);
+    if (tokenStatus instanceof Error) {
+        res.status(403).json({ message: "Expired Token" });
+    } else {
+        const password = await hashPassword(req.body.password_1);
+        try {
+            result = await User.findByIdAndUpdate(tokenStatus.id, password);
+            console.log(result);
+            res.status(200).json({
+                message: `${tokenStatus.name}, your password has been successfully updated`,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+};
 
 // ----------------------------------------------------------------------- //
 

@@ -14,9 +14,6 @@ const {
 // get all posts from the blog
 router.get("/", listAllPosts);
 
-// get posts with "word"
-router.get("/find/:word", listPostWithWord);
-
 //add new post
 router.post("/add-post", isAuth, validatorPost, newPost);
 
