@@ -5,3 +5,4 @@ DB: MongoDB
 BackEnd: NodeJS    
 FrontEnd: React
 --------------------------------------------------------------
+See documentation at Wiki section
