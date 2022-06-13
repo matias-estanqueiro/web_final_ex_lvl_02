@@ -16,7 +16,7 @@ const validatorPost = [
 
     (req, res, next) => {
         const errors = validationResult(req);
-        // Si errors NO esta vacio
+        //if errors NOT empty
         !errors.isEmpty()
             ? res.status(400).json({ errores: errors.array() })
             : next();

@@ -21,7 +21,7 @@ const validatorUser = [
         .isLength({ min: 2, max: 90 })
         .withMessage("Character count: min 2; max 90"),
 
-    check("birthdate")
+    check("birthday")
         .trim()
         .isDate("MM-DD-YYYY")
         .withMessage("Enter valid date (MM-DD-YYYY)")

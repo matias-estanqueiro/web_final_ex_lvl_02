@@ -51,6 +51,10 @@ funciones básicas
 - OBJECT QUERY
     01/06 12.31 // Post -> list only post with word in title OK!
 
+- JWT
+    12/06 16.39 // Post -> modify post & delete post with valid token OK!
+    
+
 
 ------------------------------------------------------
 QUEDA PENDIENTE

@@ -1,6 +1,7 @@
 "use strict";
 
 const Post = require("./postsModel");
+const mongoose = require("mongoose");
 
 // show all blog posts
 const listAllPosts = async (req, res, next) => {
@@ -13,17 +14,20 @@ const listAllPosts = async (req, res, next) => {
     !result.length ? next() : res.status(200).json(result);
 };
 
-// show post with word in title
-const listPostWithWord = async (req, res, next) => {
-    !result.length ? next() : res.status(200).json(result);
+// show especific blog post
+const listSelectedPost = async (req, res, next) => {
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
+    const result = await Post.find({ _id: req.params.id });
+    if (!result.length) return next();
+    res.status(200).json(result);
 };
 
 // add a new blog post
 const newPost = async (req, res, next) => {
     try {
-        console.log(req.userInfo.name);
         const newPost = new Post({
-            author: req.userInfo.name + " " + req.userInfo.surname,
+            author: req.userInfo.mail,
             ...req.body,
         });
         const result = await newPost.save();
@@ -36,26 +40,52 @@ const newPost = async (req, res, next) => {
 
 // remove an existing blog post
 const deletePost = async (req, res, next) => {
-    const result = await Post.findByIdAndDelete(req.params.id);
-    !result ? next() : res.status(200).json(result);
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
+    const result = await Post.find({ _id: req.params.id });
+    if (!result.length) return next();
+    if (result[0].author === req.userInfo.mail) {
+        const DeleteResult = await Post.findByIdAndDelete(result[0].id);
+        res.status(200).json({ message: "The post was deleted correctly!" });
+    } else {
+        let error = new Error();
+        error.status = 401;
+        error.message = "You can only delete the posts you created!";
+        next(error);
+    }
 };
 
 // modify existing blog post
 const modifyPost = async (req, res, next) => {
-    try {
-        const result = await Post.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
+    const result = await Post.find({ _id: req.params.id });
+    if (!result.length) return next();
+    if (result[0].author === req.userInfo.mail) {
+        if (!req.body.title) req.body.title = result[0].title;
+        if (!req.body.content) req.body.content = result[0].content;
+        const modifyResult = await Post.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+            }
+        );
+        res.status(200).json({
+            message: "The post was modified correctly!",
+            post: modifyResult,
         });
-        res.status(200).json(result);
-    } catch (error) {
-        error.status = 400;
+    } else {
+        let error = new Error();
+        error.status = 401;
+        error.message = "You can only modify the posts you created!";
         next(error);
     }
 };
 
 module.exports = {
     listAllPosts,
-    listPostWithWord,
+    listSelectedPost,
     newPost,
     deletePost,
     modifyPost,

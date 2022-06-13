@@ -7,6 +7,7 @@ const { tokenSign, tokenVerify } = require("../utils/handleJWT");
 const { transport } = require("../utils/handleMail");
 // Extracts data validated or sanitized by express-validator from the request and builds an object with them
 const { matchedData } = require("express-validator");
+const mongoose = require("mongoose");
 
 //get all users of the database
 const listAllUsers = async (req, res, next) => {
@@ -16,9 +17,11 @@ const listAllUsers = async (req, res, next) => {
 
 // get a specific User
 const listUserById = async (req, res, next) => {
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
     // I tried to use .findById() but it did not return the result of the query. That's why .find() was used
     const result = await User.find({ _id: req.params.id });
-    !result.length ? next() : res.status(200).json(result);
+    !result.length ? next() : res.status(200).json(result[0]);
 };
 
 // login user
@@ -32,7 +35,6 @@ const loginUser = async (req, res, next) => {
         const userData = {
             id: result[0]._id,
             name: result[0].name,
-            surname: result[0].surname,
             mail: result[0].mail,
         };
         // Token creation
@@ -68,11 +70,11 @@ const registerUser = async (req, res, next) => {
     });
     try {
         result = await newUser.save();
+
         // Token payload
         const userData = {
-            id: req.body._id,
+            id: result._id,
             name: req.body.name,
-            surname: req.body.surname,
             mail: req.body.mail,
         };
         // Token creation
@@ -89,12 +91,20 @@ const registerUser = async (req, res, next) => {
 
 // delete existing user
 const deleteUser = async (req, res, next) => {
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
     const result = await User.findByIdAndDelete(req.params.id);
-    !result ? next() : res.status(200).json(result);
+    !result
+        ? next()
+        : res
+              .status(200)
+              .json({ message: `${result.name} removed successfully` });
 };
 
 // modify user information (profile)
 const modifyUser = async (req, res, next) => {
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
     try {
         // when the user modifies his data, he cannot modify his password from the endpoint itself. A change password button will be added that will use the "reset password" logic (mail + link + token)
         const result = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -118,7 +128,6 @@ const retrievePassword = async (req, res, next) => {
     const userData = {
         id: result[0]._id,
         name: result[0].name,
-        surname: result[0].surname,
         mail: result[0].mail,
     };
     // Token creation

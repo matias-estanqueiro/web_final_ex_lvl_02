@@ -1,6 +1,7 @@
 "use strict";
 
 const router = require("express").Router();
+const isAuth = require("../utils/handleAuthorization");
 const {
     validatorUser,
     validatorLoginUser,
@@ -21,6 +22,12 @@ const {
 
 // ------------------------------------------------------------- //
 
+// get all users from the database
+router.get("/", listAllUsers);
+
+// get specific user
+router.get("/view/:id", isAuth, listUserById);
+
 // login user
 router.get("/login", validatorLoginUser, loginUser);
 
@@ -32,17 +39,11 @@ router.post(
     registerUser
 );
 
-// get specific user
-router.get("/view/:id", listUserById);
-
-// delete existing user
-router.delete("/remove/:id", deleteUser);
+// delete existing user (owner & admin function)
+router.delete("/remove/:id", isAuth, deleteUser);
 
 // modify user information (profile)
-router.post("/modify/:id", fileUpload.single("file"), modifyUser);
-
-// get all users from the database
-router.get("/", listAllUsers);
+router.post("/modify/:id", isAuth, modifyUser);
 
 // --------------------- PASSWORD RECOVERY ROUTES ------------------- //
 
