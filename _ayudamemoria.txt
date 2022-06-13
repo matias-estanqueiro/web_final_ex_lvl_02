@@ -53,17 +53,20 @@ funciones básicas
 
 - JWT
     12/06 16.39 // Post -> modify post & delete post with valid token OK!
-    
+
+- DOCUMENTATION
+    13/06 00.24 // User -> full document OK!
+    13/06 00.24 // Product ->  need to complete document
+    13/06 00.24 // Post -> need to complete document
 
 
 ------------------------------------------------------
 QUEDA PENDIENTE
 ------------------------------------------------------
 
-
 - CUANDO SUBO LA IMAGEN, FALTA HACERLE RESIZE
-- EN MICROSERVICIO USER CUANDO EL USUARIO NO SE REGISTRA SUBE LA IMAGEN IGUAL --- ESO ESTA MAL ---
+
 - EN MICROSERVICIO BLOG CON express-validator TENGO QUE VER COMO VALIDAR EL BODY DEL COMMENT
 
-- TOKEN: SOLO ESTA APLICADO EN NEW POST, HAY QUE APLICARLO EN LAS DEMAS FUNCIONALIDADES DE POST Y EN LAS DE PRODUCT
+- TOKEN: APLICADO EN BLOG Y USER, FALTA PRODUCT
 - MATCHED-DATA SOLO ESTA APLICADO EN REGISTER, HAY QUE APLICARLO A TODO LO DEMAS
