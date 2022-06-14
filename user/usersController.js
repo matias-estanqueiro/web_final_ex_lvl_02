@@ -7,7 +7,7 @@ const { tokenSign, tokenVerify } = require("../utils/handleJWT");
 const { transport } = require("../utils/handleMail");
 // Extracts data validated or sanitized by express-validator from the request and builds an object with them
 const { matchedData } = require("express-validator");
-//
+// Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment
 const mongoose = require("mongoose");
 // The node:fs module enables interacting with the file system in a way modeled on standard POSIX functions.
 const fs = require("fs");
@@ -98,26 +98,37 @@ const registerUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
-    const result = await User.findByIdAndDelete(req.params.id);
-    !result
-        ? next()
-        : res
-              .status(200)
-              .json({ message: `${result.name} removed successfully` });
+    const result = await User.find({ _id: req.params.id });
+    if (!result.length) return next();
+    if (result[0].id === req.userInfo.id) {
+        const deleteResult = await User.findByIdAndDelete(req.params.id);
+        res.status(200).json({
+            message: `${deleteResult.name} removed successfully`,
+        });
+    } else {
+        let error = new Error();
+        error.status = 401;
+        error.message = "You can only delete your user!";
+        next(error);
+    }
 };
 
 // modify user information (profile)
 const modifyUser = async (req, res, next) => {
     // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
-    try {
+    const result = await User.find({ _id: req.params.id });
+    if (!result.length) return next();
+    if (result[0].id === req.userInfo.id) {
         // when the user modifies his data, he cannot modify his password from the endpoint itself. A change password button will be added that will use the "reset password" logic (mail + link + token)
         const result = await User.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
         });
         res.status(200).json(result);
-    } catch (error) {
-        error.status = 400;
+    } else {
+        let error = new Error();
+        error.status = 401;
+        error.message = "You can only modify your user information!";
         next(error);
     }
 };
