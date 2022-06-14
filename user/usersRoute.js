@@ -23,7 +23,7 @@ const {
 // ------------------------------------------------------------- //
 
 // get all users from the database
-router.get("/", listAllUsers);
+router.get("/", isAuth, listAllUsers);
 
 // get specific user
 router.get("/view/:id", isAuth, listUserById);

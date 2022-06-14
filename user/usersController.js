@@ -7,7 +7,10 @@ const { tokenSign, tokenVerify } = require("../utils/handleJWT");
 const { transport } = require("../utils/handleMail");
 // Extracts data validated or sanitized by express-validator from the request and builds an object with them
 const { matchedData } = require("express-validator");
+//
 const mongoose = require("mongoose");
+// The node:fs module enables interacting with the file system in a way modeled on standard POSIX functions.
+const fs = require("fs");
 
 //get all users of the database
 const listAllUsers = async (req, res, next) => {
@@ -26,6 +29,7 @@ const listUserById = async (req, res, next) => {
 
 // login user
 const loginUser = async (req, res, next) => {
+    cleanReq = matchedData(req);
     const result = await User.find({ mail: req.body.mail });
     // If result returns empty, it means that the email is not registered in the database.
     if (!result.length) return next();
@@ -46,20 +50,21 @@ const loginUser = async (req, res, next) => {
     } else {
         let error = new Error();
         error.status = 401;
-        error.message = "Unauthorized";
+        error.message =
+            "The username or password entered is not correct. Try again!";
         next(error);
     }
 };
 
 // register new user
 const registerUser = async (req, res, next) => {
-    cleanBody = matchedData(req);
+    cleanReq = matchedData(req);
     // Definition of the path of the file to be stored in the database
     let file = null;
-    req.body.file
+    req.file
         ? (file = `${process.env.PUBLIC_URL}/${req.file.filename}`)
         : // Generic file (image) in case that the user dont upload it
-          (file = `${process.env.PUBLIC_URL}/img-no-avatar.jpg`);
+          (file = `${process.env.PUBLIC_URL}/img-no-avatar.png`);
     // Encryption of the password entered by the user for storage in the database
     const password = await hashPassword(req.body.password);
     // Assigning password to the User record
@@ -70,7 +75,6 @@ const registerUser = async (req, res, next) => {
     });
     try {
         result = await newUser.save();
-
         // Token payload
         const userData = {
             id: result._id,
@@ -84,6 +88,7 @@ const registerUser = async (req, res, next) => {
             token_info: tokenData,
         });
     } catch (error) {
+        if (req.file) fs.unlinkSync(req.file.path);
         error.status = 400;
         next(error);
     }

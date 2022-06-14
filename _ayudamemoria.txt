@@ -4,9 +4,6 @@ PUNTOS QUE FALTAN DESARROLLAR
 
 Modo de entrega: despliegue de la API en un servidor y documentación.
 
-5- Funcionalidades complementarias:
-    d) Recuperación de contraseña (opcional pero recomendado)
-
 ------------------------------------------------------
 DEV LOG
 ------------------------------------------------------
@@ -23,7 +20,7 @@ funciones básicas
     21/05 14.43 // Blog -> listAll OK!
 
 - ERROR HANDLER
-    21/05 17.30 // Product -> error  handler OK! (needs review later)
+    21/05 17.30 // Product -> error handler OK! (needs review later)
     21/05 22.04 // User -> error  handler OK! 
     21/05 22.04 // Blog -> error  handler OK! (needs review later)
 
