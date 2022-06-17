@@ -57,7 +57,7 @@ const validatorUser = [
         .isEmpty()
         .withMessage("Please complete address")
         .isAlphanumeric("en-US", { ignore: " " })
-        .withMessage("Only letters & intermediate space"),
+        .withMessage("Only letters, numbers & intermediate space"),
 
     check("admin").trim(),
 

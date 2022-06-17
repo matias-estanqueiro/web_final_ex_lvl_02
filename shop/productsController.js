@@ -1,6 +1,12 @@
 "use strict";
 
 const Product = require("./productsModel");
+// Extracts data validated or sanitized by express-validator from the request and builds an object with them
+const { matchedData } = require("express-validator");
+// Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment
+const mongoose = require("mongoose");
+// The node:fs module enables interacting with the file system in a way modeled on standard POSIX functions.
+const fs = require("fs");
 
 // ------------------------------------------------------------- //
 
@@ -23,37 +29,53 @@ const listProductById = async (req, res, next) => {
     !result.length ? next() : res.status(200).json(result);
 };
 
-// add a new product (administrator only function)
+// add a new product
 const addProduct = async (req, res, next) => {
+    const cleanReq = matchedData(req);
+    let file = null;
+    req.file
+        ? (file = `${process.env.PUBLIC_URL}/${req.file.filename}`)
+        : // Generic file (image) in case that the user dont upload it
+          (file = `${process.env.PUBLIC_URL}/img-no-product.png`);
+    // Assigning file to the user record
+    const newProduct = new Product({ ...req.body, file });
     try {
-        const newProduct = new Product({ ...req.body });
         const result = await newProduct.save();
-        res.status(201).json(result);
+        res.status(201).json({
+            message: `${result.name} successfully added!`,
+            newProduct,
+        });
     } catch (error) {
+        if (req.file) fs.unlinkSync(req.file.path);
         error.status = 400;
         next(error);
     }
 };
 
-// delete product (administrator only function)
+// delete product
 const removeProduct = async (req, res, next) => {
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
     const result = await Product.findByIdAndDelete(req.params.id);
-    !result ? next() : res.status(200).json(result);
+    !result
+        ? next()
+        : res
+              .status(200)
+              .json({ message: `${result.name} removed successfully` });
 };
 
-// modify existing product (administrator only function)
+// modify existing product
 const modifyProduct = async (req, res, next) => {
-    try {
-        const result = await Product.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
-        );
-        res.status(200).json(result);
-    } catch (error) {
-        error.status = 404;
-        next(error);
-    }
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
+    const result = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+    });
+    !result
+        ? next()
+        : res.status(200).json({
+              message: `${result.name} successfully modified`,
+          });
 };
 
 module.exports = {

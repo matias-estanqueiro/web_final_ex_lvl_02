@@ -1,3 +1,5 @@
+"use strict";
+
 const User = require("./usersModel");
 // BCRYPT: A library to help you hash passwords.
 const { hashPassword, checkPassword } = require("../utils/handlePassword");
@@ -11,6 +13,8 @@ const { matchedData } = require("express-validator");
 const mongoose = require("mongoose");
 // The node:fs module enables interacting with the file system in a way modeled on standard POSIX functions.
 const fs = require("fs");
+
+// ------------------------------------------------------------- //
 
 //get all users of the database
 const listAllUsers = async (req, res, next) => {
@@ -29,7 +33,7 @@ const listUserById = async (req, res, next) => {
 
 // login user
 const loginUser = async (req, res, next) => {
-    cleanReq = matchedData(req);
+    const cleanReq = matchedData(req);
     const result = await User.find({ mail: req.body.mail });
     // If result returns empty, it means that the email is not registered in the database.
     if (!result.length) return next();
@@ -58,7 +62,7 @@ const loginUser = async (req, res, next) => {
 
 // register new user
 const registerUser = async (req, res, next) => {
-    cleanReq = matchedData(req);
+    const cleanReq = matchedData(req);
     // Definition of the path of the file to be stored in the database
     let file = null;
     req.file
@@ -67,14 +71,14 @@ const registerUser = async (req, res, next) => {
           (file = `${process.env.PUBLIC_URL}/img-no-avatar.png`);
     // Encryption of the password entered by the user for storage in the database
     const password = await hashPassword(req.body.password);
-    // Assigning password to the User record
+    // Assigning password & file to the User record
     const newUser = new User({
         ...req.body,
         password,
         file,
     });
     try {
-        result = await newUser.save();
+        const result = await newUser.save();
         // Token payload
         const userData = {
             id: result._id,
@@ -84,7 +88,7 @@ const registerUser = async (req, res, next) => {
         // Token creation
         const tokenData = { token: await tokenSign(userData, "2h"), userData };
         res.status(201).json({
-            message: `${result.name} Registered!`,
+            message: `${result.name} registered!`,
             token_info: tokenData,
         });
     } catch (error) {
@@ -124,7 +128,9 @@ const modifyUser = async (req, res, next) => {
         const result = await User.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
         });
-        res.status(200).json(result);
+        res.status(200).json({
+            message: `${result.name} successfully modified`,
+        });
     } else {
         let error = new Error();
         error.status = 401;
