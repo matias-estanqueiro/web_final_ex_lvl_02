@@ -21,7 +21,7 @@ router.get("/", listAllProducts);
 // get all the products of a category
 router.get("/:category", listCategoryProducts);
 
-router.get("/view-product/:id", listProductById);
+router.get("/view/:id", listProductById);
 
 // add new product (admin only function)
 router.post(

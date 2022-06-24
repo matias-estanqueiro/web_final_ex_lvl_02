@@ -24,6 +24,6 @@ router.post("/add-post", isAuth, validatorPost, newPost);
 router.delete("/delete/:id", isAuth, deletePost);
 
 // modify existing post (owner function only)
-router.post("/update/:id", isAuth, validatorPost, modifyPost);
+router.post("/update/:id", isAuth, modifyPost);
 
 module.exports = router;

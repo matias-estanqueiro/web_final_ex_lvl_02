@@ -1,6 +1,9 @@
 "use strict";
 
 const Post = require("./postsModel");
+// Extracts data validated or sanitized by express-validator from the request and builds an object with them
+const { matchedData } = require("express-validator");
+// Mongoose is a MongoDB object modeling tool designed to work in an asynchronous environment
 const mongoose = require("mongoose");
 
 // show all blog posts
@@ -25,13 +28,17 @@ const listSelectedPost = async (req, res, next) => {
 
 // add a new blog post
 const newPost = async (req, res, next) => {
+    const cleanReq = matchedData(req);
+    const newPost = new Post({
+        author: req.userInfo.mail,
+        ...req.body,
+    });
     try {
-        const newPost = new Post({
-            author: req.userInfo.mail,
-            ...req.body,
-        });
         const result = await newPost.save();
-        res.status(201).json(result);
+        res.status(201).json({
+            message: `${req.userInfo.name} your post was published successfully!`,
+            newPost,
+        });
     } catch (error) {
         error.status = 400;
         next(error);

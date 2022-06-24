@@ -24,6 +24,8 @@ const listCategoryProducts = async (req, res, next) => {
 
 // get a specific product
 const listProductById = async (req, res, next) => {
+    // Verify that the id found in req.params is valid, otherwise a castError (BSONTypeError) is generated. For example, if the passed id is 23 characters long instead of 24
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return next();
     // I tried to use .findById() but it did not return the result of the query. That's why .find() was used
     const result = await Product.find({ _id: req.params.id });
     !result.length ? next() : res.status(200).json(result);
