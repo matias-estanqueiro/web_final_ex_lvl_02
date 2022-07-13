@@ -29,7 +29,7 @@ router.get("/", isAuth, listAllUsers);
 router.get("/view/:id", isAuth, listUserById);
 
 // login user
-router.get("/login", validatorLoginUser, loginUser);
+router.post("/login", validatorLoginUser, loginUser);
 
 // register new user
 router.post(
